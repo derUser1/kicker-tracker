@@ -1,30 +1,32 @@
 package de.deruser.kickertracker.controller;
 
+import de.deruser.kickertracker.model.domain.Match;
+import de.deruser.kickertracker.model.domain.Player;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
+import de.deruser.kickertracker.model.domain.Team;
 import de.deruser.kickertracker.model.view.PlayerViewModel;
+import de.deruser.kickertracker.service.MatchService;
 import de.deruser.kickertracker.service.PlayerService;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class PlayerController {
 
   private PlayerService playerService;
+  private MatchService matchService;
 
   @Autowired
-  public PlayerController(final PlayerService playerService){
+  public PlayerController(final PlayerService playerService, final MatchService matchService){
     this.playerService = playerService;
+    this.matchService = matchService;
   }
 
   @ModelAttribute("module")
@@ -32,20 +34,25 @@ public class PlayerController {
     return "playerOverview";
   }
 
-  @GetMapping(value = "/players", produces = MediaType.TEXT_HTML_VALUE)
-  public String getPlayers(final Model model){
-    List<PlayerViewModel> playerList = playerService.getAllPlayers().stream()
-            .sorted(Comparator.comparingInt(PlayerInfo::getGlicko).reversed())
-            .map(this::convertToPlayerViewModel)
-            .collect(Collectors.toList());
-    model.addAttribute("playerList", playerList);
+
+  @GetMapping(value = "/players/{name}", produces = MediaType.TEXT_HTML_VALUE)
+  public String getPlayer(@PathVariable("name") String name, Model model){
+    List<Match> recentMatches = matchService.getRecentMatches(name, 0, 10);
+
+    List<Map<String, String>> recentGameList = new ArrayList<>();
+    for(Match match : recentMatches){
+      Player player = match.getTeams().stream()
+              .flatMap(team -> team.getPlayers().stream()).filter(p -> p.getName().equals(name))
+              .findAny()
+              .get();
+      Map<String, String> playerData = new HashMap<>();
+      playerData.put("timestamp", match.getTimestamp().toString());
+      playerData.put("glicko", String.valueOf(player.getGlicko()));
+      recentGameList.add(playerData);
+  }
+    model.addAttribute("recentGameList", recentGameList);
     return "playerOverview";
   }
-
-//  @GetMapping(value = "/players/{name}", produces = MediaType.TEXT_HTML_VALUE)
-//  public String getPlayer(@PathVariable("name") String name){
-//    return "playerOverview";
-//  }
 
 
 

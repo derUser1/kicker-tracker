@@ -1,18 +1,18 @@
 Application to track table soccer games. This application is based on spring boot, thymeleaf and bootstrap.
-Glicko2 rating is based on https://github.com/forwardloop/glicko2s
+Game data is stored into mongodb. Glicko2 rating is based on https://github.com/forwardloop/glicko2s
 
-Very draft version.
+## How-To
+To build the project just run "gradlew build" inside the project root. Start application with "gradlew boorRun". Due to the _gradle wrapper_ you does not have to install _gradle_ before. Open **localhost:8080**
 
-# How-To
-To build the project just run "gradlew build" inside the project root. No need to install grade. 
+If no MongoDB is defined, the application expects a running instance under the standard port localhost:27017
 
-You have to define an application property file, were you define monogdb connection. At leas following properties have to be set:
+If run a mongodb instance on a separate machine, then you have to define an application property file, were you define monogdb connection:
+
 | Property                   | Description |
 | -------------------------- | ------------- |
 | spring.data.mongodb.host:  | Host name of the mongodb server |
 
-Before a new match can be added, the players must first be created. These can then be selected from the drop-down menu. Here, api
-can be used:
+Before a new match can be added, the players must first be created. These can then be selected from the drop-down menu. The API is currently used to create a new user:
 
 | Method | Path | Description |
 | ------ | ---- | ----------- |
@@ -20,9 +20,14 @@ can be used:
 | POST   | /api/players?name=<name> | creates a new player. the name is specified by query variable |
 
 
-# ToDo
-* Add glicko evaluation
-* Show score board
+Sites:
+| URL | Description |
+| --- | ----------- |
+| /   | home |
+| /matches | Overview of matches |
+| /players/<name> | Player related information |
+
+## ToDo
 * Show rating as graph
 * Build into docker
 * User management

@@ -8,25 +8,26 @@
 <body>
 <div class="container">
     <div th:replace="fragments/header :: header">&nbsp;</div>
+    <p>TODO: add graph here</p>
     <div class="card">
         <div class="card-header">
-            <strong>Player ranking</strong>
+            <strong>Recent games</strong>
         </div>
         <div class="card-body">
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Name</th>
+                    <th>Timestamp</th>
                     <th>Glicko</th>
                 </tr>
                 </thead>
                 <tbody>
-                <th:block th:each="p,iter : ${playerList}">
+                <th:block th:each="g,iter : ${recentGameList}">
                     <tr>
                         <td th:text="${iter.index + 1}"/>
-                        <td><span th:text="${p.name}"/></td>
-                        <td><span th:text="${p.glicko}"/></td>
+                        <td><span th:text="${g.get('timestamp')}"/></td>
+                        <td><span th:text="${g.get('glicko')}"/></td>
                     </tr>
                 </th:block>
                 </tbody>

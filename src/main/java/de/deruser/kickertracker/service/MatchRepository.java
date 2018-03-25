@@ -3,9 +3,11 @@ package de.deruser.kickertracker.service;
 
 import de.deruser.kickertracker.model.domain.Match;
 
+import de.deruser.kickertracker.model.domain.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -25,10 +27,20 @@ public class MatchRepository {
     this.mongoTemplate = mongoTemplate;
   }
 
-  public List<Match> findMatchesOrdered(final int limit){
+  public List<Match> findMatchesOrdered(final int skip, final int limit){
     Query query = new Query();
     query.with(new Sort(Sort.Direction.DESC, "timestamp"))
+         .skip(skip)
          .limit(limit);
+    return mongoTemplate.find(query, Match.class);
+  }
+
+  public List<Match> findRecentGamesForPlayer(final String name, final int skip, final int limit){
+    Query query = new Query()
+            .addCriteria(Criteria.where("teams.players.name").is(name))
+            .with(new Sort(Sort.Direction.DESC, "timestamp"))
+            .skip(skip)
+            .limit(limit);
     return mongoTemplate.find(query, Match.class);
   }
 

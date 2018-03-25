@@ -19,6 +19,7 @@ public class PlayerInfo {
   @Id
   private String name;
   private String password;
+  private String team;
   private int glicko;
   private int deviation;
   private double volatility;

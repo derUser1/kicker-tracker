@@ -2,8 +2,10 @@ package de.deruser.kickertracker.controller;
 
 import de.deruser.kickertracker.model.domain.Match;
 import de.deruser.kickertracker.model.domain.Player;
+import de.deruser.kickertracker.model.domain.PlayerInfo;
 import de.deruser.kickertracker.model.domain.Team;
 import de.deruser.kickertracker.model.view.MatchViewModel;
+import de.deruser.kickertracker.model.view.PlayerViewModel;
 import de.deruser.kickertracker.model.view.TeamViewModel;
 import de.deruser.kickertracker.service.MatchService;
 import de.deruser.kickertracker.service.PlayerService;
@@ -11,7 +13,9 @@ import de.deruser.kickertracker.service.PlayerService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,8 +51,14 @@ public class MatchController {
     players.add(NOT_AVAILBLE);
     players.addAll(playerService.getAllPlayerNames());
 
-    List<MatchViewModel> matchList = matchService.getRecentMatches(10).stream()
+    List<MatchViewModel> matchList = matchService.getRecentMatches(0,10).stream()
             .map(this::convertMatch).collect(toList());
+
+    List<PlayerViewModel> playerList = playerService.getAllPlayers().stream()
+            .sorted(Comparator.comparingInt(PlayerInfo::getGlicko).reversed())
+            .map(this::convertToPlayerViewModel)
+            .collect(Collectors.toList());
+    model.addAttribute("playerList", playerList);
 
     model.addAttribute("playerNames", players);
     model.addAttribute("matchList", matchList);
@@ -56,12 +66,19 @@ public class MatchController {
     return "matchesOverview";
   }
 
-
-
   @PostMapping("/api/matches")
   public String addMatch(@ModelAttribute("matchViewModel") MatchViewModel matchViewModel){
     matchService.addMatch(convertMatchViewModel(matchViewModel));
     return "redirect:/matches";
+  }
+
+
+  /*--------- Helper methods --------------------*/
+  private PlayerViewModel convertToPlayerViewModel(final PlayerInfo playerInfo){
+    PlayerViewModel playerViewModel = new PlayerViewModel();
+    playerViewModel.setName(playerInfo.getName());
+    playerViewModel.setGlicko(playerInfo.getGlicko());
+    return playerViewModel;
   }
 
   private Match convertMatchViewModel(final MatchViewModel matchViewModel){

@@ -41,27 +41,34 @@ public class MatchService {
     return false;
   }
 
-  private void updatePlayersGlicko(final Match match){
-      match.getTeams().stream().flatMap(t -> t.getPlayers().stream()).forEach(playerService::updatePlayer);
-  }
-
+  /**
+   * Computes new stats for each player of the given match
+   * @param match Match information
+   * @return Update player stats
+   */
   private Match computeGlicko(final Match match){
     Team teamOne = match.getTeams().get(0);
     Team teamTwo = match.getTeams().get(1);
 
-      Team.TeamBuilder teamOneBuilder = teamOne.toBuilder().players(computeGlicko(teamOne, teamTwo));
-      Team.TeamBuilder teamTwoBuilder = teamTwo.toBuilder().players(computeGlicko(teamTwo, teamOne));
+    Team.TeamBuilder teamOneBuilder = teamOne.toBuilder().players(computeGlicko(teamOne, teamTwo));
+    Team.TeamBuilder teamTwoBuilder = teamTwo.toBuilder().players(computeGlicko(teamTwo, teamOne));
 
-     return match.toBuilder()
-             .teams(Arrays.asList(teamOneBuilder.build(), teamTwoBuilder.build()))
-             .build();
+    return match.toBuilder()
+           .teams(Arrays.asList(teamOneBuilder.build(), teamTwoBuilder.build()))
+           .build();
   }
 
+  /**
+   * Computes new stats for each player of the first team (teamOne)
+   * @param teamOne team, which player stats will be computed
+   * @param teamTwo opponent team
+   * @return List of updated player stats
+   */
   private List<Player> computeGlicko(final Team teamOne, final Team teamTwo){
     List<Player> result = new ArrayList<>();
     EloResult eloResult = teamOne.getScore() > teamTwo.getScore() ? Glicko2J.Win : Glicko2J.Loss;
     for(Player player : teamOne.getPlayers()){
-        Player opponent = getOpponent(player.getGlicko(), teamTwo);
+        Player opponent = getOpponent(player, teamTwo);
         PlayerInfo currentPlayerInfo = playerService.getPlayer(player.getName());
         PlayerInfo opponentPlayerInfo = playerService.getPlayer(opponent.getName());
         Glicko2 newGlicko = computeGlicko(currentPlayerInfo, opponentPlayerInfo, eloResult);
@@ -75,6 +82,13 @@ public class MatchService {
     return result;
   }
 
+  /**
+   * Computes glicko for given player
+   * @param player which stats will be computed
+   * @param opponent of the player
+   * @param outcome game outcome
+   * @return new glicko value
+   */
   private Glicko2 computeGlicko(final PlayerInfo player, final PlayerInfo opponent, final EloResult outcome){
     Glicko2 currentPlayer = new Glicko2(player.getGlicko(), player.getDeviation(), player.getVolatility());
     Glicko2 opponentPlayer = new Glicko2(opponent.getGlicko(), opponent.getDeviation(), opponent.getVolatility());
@@ -84,26 +98,59 @@ public class MatchService {
     return Glicko2J.calculateNewRating(currentPlayer, Collections.singletonList(tuple2));
   }
 
-  private Player getOpponent(final int glicko, final Team team){
+  /**
+   * Determines opponent of the given player. The new glicko of the given player is computed in respect to the opponent.
+   * The opponent is the player with the closest glicko to the current player.
+   * @param player current player
+   * @param team opponent team
+   * @return opponent player
+   */
+  private Player getOpponent(final Player player, final Team team){
     Player opponent = null;
-    for(Player player : team.getPlayers()){
+    for(Player currentOpponent : team.getPlayers()){
       if(opponent == null){
-        opponent = player;
+        opponent = currentOpponent;
         continue;
       }
-      int currentOpponent = Math.abs(glicko - player.getGlicko());
-      int oldOpponent = Math.abs(glicko - opponent.getGlicko());
-      if(currentOpponent < oldOpponent){
-        opponent = player;
+      int currentOpponentGlicko = Math.abs(player.getGlicko() - currentOpponent.getGlicko());
+      int oldOpponentGlicko = Math.abs(player.getGlicko() - currentOpponent.getGlicko());
+      if(currentOpponentGlicko < oldOpponentGlicko){
+        opponent = currentOpponent;
       }
     }
     return opponent;
   }
 
-  public List<Match> getRecentMatches(final int limit) {
-    return this.matchRepository.findMatchesOrdered(limit);
+  private void updatePlayersGlicko(final Match match){
+    match.getTeams().stream().flatMap(t -> t.getPlayers().stream()).forEach(playerService::updatePlayerStats);
   }
 
+  /**
+   * Return a list of recent matches for a given player
+   * @param name player
+   * @param skip amount of entries to skip
+   * @param limit amount of entries to receive
+   * @return list of {@link Match}
+   */
+  public List<Match> getRecentMatches(final String name, final int skip, final int limit) {
+    return this.matchRepository.findRecentGamesForPlayer(name, skip, limit);
+  }
+
+  /**
+   * Return a list of recent matches
+   * @param skip amount of entries to skip
+   * @param limit amount of entries to receive
+   * @return list of {@link Match}
+   */
+  public List<Match> getRecentMatches(final int skip, final int limit) {
+    return this.matchRepository.findMatchesOrdered(skip, limit);
+  }
+
+  /**
+   * Check whether mach is valid
+   * @param match to check
+   * @return true if valid; otherwise - false
+   */
   private boolean isValid(final Match match){
     return isValidScore(match) && isValidPlayers(match);
   }

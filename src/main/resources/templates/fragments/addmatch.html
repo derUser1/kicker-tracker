@@ -1,11 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <link th:href="@{/css/bootstrap.css}" rel="stylesheet" />
-    <title>Add Match</title>
-</head>
-<body>
 <form action="#" th:action="@{/api/matches}" th:object="${matchViewModel}" method="post" th:fragment="addmatch">
     <div class="row">
         <div class="col-md">
@@ -97,5 +91,4 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-</body>
 </html>
