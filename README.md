@@ -6,7 +6,7 @@ To build the project just run "gradlew build" inside the project root. Start app
 
 If no MongoDB is defined, the application expects a running instance under the standard port localhost:27017
 
-If run a mongodb instance on a separate machine, then you have to define an application property file, were you define monogdb connection:
+If you run a mongodb instance on a separate machine, then you have to define an application property file, were you define monogdb connection:
 
 | Property                   | Description |
 | -------------------------- | ------------- |
