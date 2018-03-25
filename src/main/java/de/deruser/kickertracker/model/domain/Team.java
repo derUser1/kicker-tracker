@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @ToString
-@Builder
+@Builder(toBuilder = true)
 @EqualsAndHashCode
 public class Team {
   private List<Player> players;

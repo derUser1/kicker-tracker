@@ -11,7 +11,7 @@ import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @ToString
 @EqualsAndHashCode
 @Document(collection = "matches")

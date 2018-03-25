@@ -8,8 +8,10 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
+
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @ToString
 @Document(collection = "players")
 public class PlayerInfo {
@@ -20,6 +22,8 @@ public class PlayerInfo {
   private int glicko;
   private int deviation;
   private double volatility;
+  private Instant created;
+  private Instant lastModified;
 }
 
 

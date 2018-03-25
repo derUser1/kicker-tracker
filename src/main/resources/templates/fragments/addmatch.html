@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet" />
+    <title>Add Match</title>
+</head>
+<body>
+<form action="#" th:action="@{/api/matches}" th:object="${matchViewModel}" method="post" th:fragment="addmatch">
+    <div class="row">
+        <div class="col-md">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Team 1</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md">
+                            <label class="control-label">Player 1</label>
+                            <div th:if="${playerNames != null and not #lists.isEmpty(playerNames)}">
+                                <select class="selectpicker" id="team1Player1" th:field="*{teamOne.players[0]}">
+                                    <option th:each="dropDownItem : ${playerNames}"
+                                            th:value="${dropDownItem}"
+                                            th:text="${dropDownItem}" >
+                                    </option>
+                                </select>
+                            </div>
+                            <div th:if="${playerNames == null or #lists.isEmpty(playerNames)}">
+                                <div>"No players were found, please create some first"</div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <label class="control-label">Player 2</label>
+                            <div th:if="${playerNames != null and not #lists.isEmpty(playerNames)}">
+                                <select class="selectpicker" id="team1Player2" th:field="*{teamOne.players[1]}">
+                                    <option th:each="dropDownItem : ${playerNames}"
+                                            th:value="${dropDownItem}"
+                                            th:text="${dropDownItem}" >
+                                    </option>
+                                </select>
+                            </div>
+                            <div th:if="${playerNames == null or #lists.isEmpty(playerNames)}">
+                                <div>"No players were found, please create some first"</div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <label>Score</label>
+                            <input type="number" class="form-control form-control-sm" placeholder="0" th:field="*{teamOne.score}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Team 2</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md">
+                            <label class="control-label">Player 1</label>
+                            <div th:if="${playerNames != null and not #lists.isEmpty(playerNames)}">
+                                <select class="selectpicker" id="team2Player1" th:field="*{teamTwo.players[0]}">
+                                    <option th:each="dropDownItem : ${playerNames}"
+                                            th:value="${dropDownItem}"
+                                            th:text="${dropDownItem}" >
+                                    </option>
+                                </select>
+                            </div>
+                            <div th:if="${playerNames == null or #lists.isEmpty(playerNames)}">
+                                <div>"No players were found, please create some first"</div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <label class="control-label">Player 2</label>
+                            <div th:if="${playerNames != null and not #lists.isEmpty(playerNames)}">
+                                <select class="selectpicker" id="team2Player2" th:field="*{teamTwo.players[1]}">
+                                    <option th:each="dropDownItem : ${playerNames}"
+                                            th:value="${dropDownItem}"
+                                            th:text="${dropDownItem}" >
+                                    </option>
+                                </select>
+                            </div>
+                            <div th:if="${playerNames == null or #lists.isEmpty(playerNames)}">
+                                <div>"No players were found, please create some first"</div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <label for="scoreTeam2">Score</label>
+                            <input type="number" class="form-control form-control-sm" id="scoreTeam2" th:field="*{teamTwo.score}" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</body>
+</html>

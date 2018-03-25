@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet" />
+    <title>Title</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm bg-light navbar-light navbar-fixed-top" th:fragment="header">
+        <div class="container">
+            <ul class="navbar-nav">
+                <li th:classappend="${module == 'matchOverview' ? 'active' : ''}">
+                    <a class="nav-link" href="#" th:href="@{/matches}">Matches</a>
+                </li>
+                <li th:classappend="${module == 'playerOverview' ? 'active' : ''}">
+                    <a class="nav-link " href="#" th:href="@{/players}">Player stats</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</body>
+</html>

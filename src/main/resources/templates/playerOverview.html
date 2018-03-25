@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet" />
+    <title>Player</title>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/header :: header">&nbsp;</div>
+    <div class="card">
+        <div class="card-header">
+            <strong>Player ranking</strong>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Glicko</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="p,iter : ${playerList}">
+                    <tr>
+                        <td th:text="${iter.index + 1}"/>
+                        <td><span th:text="${p.name}"/></td>
+                        <td><span th:text="${p.glicko}"/></td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

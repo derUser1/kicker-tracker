@@ -36,15 +36,26 @@ public class MatchController {
     this.playerService = playerService;
   }
 
+  @ModelAttribute("module")
+  public String module() {
+    return "matchOverview";
+  }
+
   @GetMapping("/matches")
-  public String getMatches(Model model) {
+  public String getMatches(final Model model) {
     List<String> players = new ArrayList<>();
     players.add(NOT_AVAILBLE);
     players.addAll(playerService.getAllPlayerNames());
+
+    List<MatchViewModel> matchList = matchService.getRecentMatches(10).stream()
+            .map(this::convertMatch).collect(toList());
+
     model.addAttribute("playerNames", players);
+    model.addAttribute("matchList", matchList);
     model.addAttribute("matchViewModel", new MatchViewModel());
     return "matchesOverview";
   }
+
 
 
   @PostMapping("/api/matches")
@@ -52,7 +63,6 @@ public class MatchController {
     matchService.addMatch(convertMatchViewModel(matchViewModel));
     return "redirect:/matches";
   }
-
 
   private Match convertMatchViewModel(final MatchViewModel matchViewModel){
     List<Team> teams = Arrays.asList(convertTeamViewModel(matchViewModel.getTeamOne()),
@@ -73,5 +83,19 @@ public class MatchController {
         .score(teamViewModel.getScore())
         .players(players)
         .build();
+  }
+
+  private MatchViewModel convertMatch(final Match match){
+      MatchViewModel matchViewModel = new MatchViewModel();
+      matchViewModel.setTeamOne(convertTeam(match.getTeams().get(0)));
+      matchViewModel.setTeamTwo(convertTeam(match.getTeams().get(1)));
+      return matchViewModel;
+  }
+
+  private TeamViewModel convertTeam(final Team team){
+      TeamViewModel teamViewModel = new TeamViewModel();
+      teamViewModel.setPlayers(team.getPlayers().stream().map(Player::getName).collect(toList()));
+      teamViewModel.setScore(team.getScore());
+      return teamViewModel;
   }
 }

@@ -1,20 +1,21 @@
 package de.deruser.kickertracker.controller;
 
 import de.deruser.kickertracker.model.domain.PlayerInfo;
+import de.deruser.kickertracker.model.view.PlayerViewModel;
 import de.deruser.kickertracker.service.PlayerService;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class PlayerController {
@@ -26,6 +27,29 @@ public class PlayerController {
     this.playerService = playerService;
   }
 
+  @ModelAttribute("module")
+  public String module() {
+    return "playerOverview";
+  }
+
+  @GetMapping(value = "/players", produces = MediaType.TEXT_HTML_VALUE)
+  public String getPlayers(final Model model){
+    List<PlayerViewModel> playerList = playerService.getAllPlayers().stream()
+            .sorted(Comparator.comparingInt(PlayerInfo::getGlicko).reversed())
+            .map(this::convertToPlayerViewModel)
+            .collect(Collectors.toList());
+    model.addAttribute("playerList", playerList);
+    return "playerOverview";
+  }
+
+//  @GetMapping(value = "/players/{name}", produces = MediaType.TEXT_HTML_VALUE)
+//  public String getPlayer(@PathVariable("name") String name){
+//    return "playerOverview";
+//  }
+
+
+
+  /*-------------- API part ----------------*/
   @GetMapping(value = "/api/players", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public List<PlayerInfo> getAllPlayers(){
@@ -37,5 +61,13 @@ public class PlayerController {
   @ResponseBody
   public ResponseEntity<?> addPlayer(@RequestParam("name") String name){
     return ResponseEntity.ok(playerService.addPlayer(name));
+  }
+
+
+  private PlayerViewModel convertToPlayerViewModel(final PlayerInfo playerInfo){
+    PlayerViewModel playerViewModel = new PlayerViewModel();
+    playerViewModel.setName(playerInfo.getName());
+    playerViewModel.setGlicko(playerInfo.getGlicko());
+    return playerViewModel;
   }
 }

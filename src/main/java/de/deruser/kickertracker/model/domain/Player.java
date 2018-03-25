@@ -9,7 +9,7 @@ import java.util.Objects;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @ToString
 public class Player {
 
