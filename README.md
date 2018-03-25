@@ -2,7 +2,7 @@ Application to track table soccer games. This application is based on spring boo
 Game data is stored into mongodb. Glicko2 rating is based on https://github.com/forwardloop/glicko2s
 
 ## How-To
-To build the project just run "gradlew build" inside the project root. Start application with "gradlew boorRun". Due to the _gradle wrapper_ you does not have to install _gradle_ before. Open **localhost:8080**
+To build the project just run "gradlew build" inside the project root. Start application with "gradlew bootRun". Due to the _gradle wrapper_ you does not have to install _gradle_ before. Open **localhost:8080**
 
 If no MongoDB is defined, the application expects a running instance under the standard port localhost:27017
 
