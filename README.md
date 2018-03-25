@@ -26,7 +26,7 @@ Sites:
 | --- | ----------- |
 | /   | home |
 | /matches | Overview of matches |
-| /players/<name> | Player related information |
+| /players/#player name# | Player related information |
 
 ## ToDo
 * Show rating as graph
