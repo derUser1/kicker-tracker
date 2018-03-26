@@ -18,6 +18,7 @@ public class Player {
   private int glicko;
   private int deviation;
   private double volatility;
+  private Integer glickoChange;
 
   @Override
   public boolean equals(Object o) {

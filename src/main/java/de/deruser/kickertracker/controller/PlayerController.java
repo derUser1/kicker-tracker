@@ -3,19 +3,27 @@ package de.deruser.kickertracker.controller;
 import de.deruser.kickertracker.model.domain.Match;
 import de.deruser.kickertracker.model.domain.Player;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
-import de.deruser.kickertracker.model.domain.Team;
 import de.deruser.kickertracker.model.view.PlayerViewModel;
 import de.deruser.kickertracker.service.MatchService;
 import de.deruser.kickertracker.service.PlayerService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class PlayerController {
@@ -40,16 +48,21 @@ public class PlayerController {
     List<Match> recentMatches = matchService.getRecentMatches(name, 0, 10);
 
     List<Map<String, String>> recentGameList = new ArrayList<>();
-    for(Match match : recentMatches){
-      Player player = match.getTeams().stream()
-              .flatMap(team -> team.getPlayers().stream()).filter(p -> p.getName().equals(name))
-              .findAny()
-              .get();
-      Map<String, String> playerData = new HashMap<>();
-      playerData.put("timestamp", match.getTimestamp().toString());
-      playerData.put("glicko", String.valueOf(player.getGlicko()));
-      recentGameList.add(playerData);
-  }
+    for(Match match : recentMatches) {
+      Optional<Player> player = match.getTeams().stream()
+          .flatMap(team -> team.getPlayers().stream())
+          .filter(p -> p.getName().equals(name))
+          .findAny();
+      if (player.isPresent()) {
+        Map<String, String> playerData = new HashMap<>();
+        playerData.put("timestamp", match.getTimestamp().toString());
+        playerData.put("glicko", String.valueOf(player.get().getGlicko()));
+        playerData.put("deviation", String.valueOf(player.get().getDeviation()));
+        playerData.put("glickoChange", String.valueOf(player.get().getGlickoChange()));
+
+        recentGameList.add(playerData);
+      }
+    }
     model.addAttribute("recentGameList", recentGameList);
     return "playerOverview";
   }

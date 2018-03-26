@@ -1,13 +1,15 @@
 package de.deruser.kickertracker.service;
 
 import de.deruser.kickertracker.model.domain.PlayerInfo;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public class PlayerRepository {
@@ -33,4 +35,12 @@ public class PlayerRepository {
     mongoTemplate.save(playerInfo);
   }
 
+  public void restStats(final int glicko, final int deviation, final double volatility) {
+    Query query = new Query();
+    Update update = new Update()
+        .set("glicko", glicko)
+        .set("deviation", deviation)
+        .set("volatility", volatility);
+    mongoTemplate.updateMulti(query, update, PlayerInfo.class);
+  }
 }

@@ -7,11 +7,16 @@ import de.deruser.kickertracker.model.domain.Team;
 import forwardloop.glicko2s.EloResult;
 import forwardloop.glicko2s.Glicko2;
 import forwardloop.glicko2s.Glicko2J;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import scala.Tuple2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class MatchService {
@@ -76,7 +81,8 @@ public class MatchService {
         Player.PlayerBuilder playerBuilder = player.toBuilder()
                 .glicko((int) newGlicko.rating())
                 .deviation((int) newGlicko.ratingDeviation())
-                .volatility(newGlicko.ratingVolatility());
+                .volatility(newGlicko.ratingVolatility())
+                .glickoChange(currentPlayerInfo.getGlicko() - (int) newGlicko.rating());
         result.add(playerBuilder.build());
     }
     return result;
@@ -202,5 +208,13 @@ public class MatchService {
     return true;
   }
 
-
+  public void reprocessStats() {
+    playerService.resetAllStats(1500, 350, 0.06d);
+    List<Match> matches = matchRepository.finaAllMatches();
+    for(Match match : matches){
+      Match updatedMatch = computeGlicko(match);
+      matchRepository.save(updatedMatch);
+      updatePlayersGlicko(updatedMatch);
+    }
+  }
 }

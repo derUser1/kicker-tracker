@@ -8,6 +8,7 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -17,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "matches")
 public class Match {
 
+    private ObjectId id;
     private Instant timestamp;
     private List<Team> teams;
 

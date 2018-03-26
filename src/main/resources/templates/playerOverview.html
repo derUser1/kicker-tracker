@@ -20,6 +20,7 @@
                     <th>#</th>
                     <th>Timestamp</th>
                     <th>Glicko</th>
+                    <th>Glicko change</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -27,7 +28,8 @@
                     <tr>
                         <td th:text="${iter.index + 1}"/>
                         <td><span th:text="${g.get('timestamp')}"/></td>
-                        <td><span th:text="${g.get('glicko')}"/></td>
+                        <td><span th:text="${g.get('glicko')}"/>&plusmn;<span th:text="${g.get('deviation')}"/></td>
+                        <td><span th:text="${g.get('glickoChange')}"/></td>
                     </tr>
                 </th:block>
                 </tbody>

@@ -2,13 +2,14 @@ package de.deruser.kickertracker.service;
 
 import de.deruser.kickertracker.model.domain.Player;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PlayerService {
@@ -73,5 +74,9 @@ public class PlayerService {
             .volatility(player.getVolatility())
             .lastModified(Instant.now());
     playerRepository.save(playerInfoBuilder.build());
+  }
+
+  public void resetAllStats(final int glicko, final int deviation, final double volatility){
+    playerRepository.restStats(glicko, deviation, volatility);
   }
 }
