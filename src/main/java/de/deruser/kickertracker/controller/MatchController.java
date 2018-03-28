@@ -56,7 +56,7 @@ public class MatchController {
             .map(this::convertMatch).collect(toList());
 
     List<PlayerViewModel> playerList = playerService.getAllPlayers().stream()
-            .sorted(Comparator.comparingInt(PlayerInfo::getGlicko).reversed())
+            .sorted((p1, p2) -> Integer.compare(p2.getGameStats().getGlicko(), p1.getGameStats().getGlicko()))
             .map(this::convertToPlayerViewModel)
             .collect(Collectors.toList());
     model.addAttribute("playerList", playerList);
@@ -83,7 +83,7 @@ public class MatchController {
   private PlayerViewModel convertToPlayerViewModel(final PlayerInfo playerInfo){
     PlayerViewModel playerViewModel = new PlayerViewModel();
     playerViewModel.setName(playerInfo.getName());
-    playerViewModel.setGlicko(playerInfo.getGlicko());
+    playerViewModel.setGlicko(playerInfo.getGameStats().getGlicko());
     return playerViewModel;
   }
 

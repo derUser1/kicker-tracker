@@ -4,10 +4,10 @@
         <div class="container">
             <ul class="navbar-nav">
                 <li th:classappend="${module == 'matchOverview' ? 'active' : ''}">
-                    <a class="nav-link" href="#" th:href="@{/matches}">Matches</a>
+                    <a class="nav-link" href="#" th:href="@{/matches}" th:text="#{navigation.matches}"/>
                 </li>
                 <li th:classappend="${module == 'playerOverview' ? 'active' : ''}">
-                    <a class="nav-link " href="#" th:href="@{/players/enter_player_name_here}">Player stats</a>
+                    <a class="nav-link " href="#" th:href="@{/players/enter_player_name_here}" th:text="#{navigation.player.stats}"/>
                 </li>
             </ul>
         </div>

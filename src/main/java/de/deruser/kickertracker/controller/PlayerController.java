@@ -59,12 +59,18 @@ public class PlayerController {
         playerData.put("glicko", String.valueOf(player.get().getGlicko()));
         playerData.put("deviation", String.valueOf(player.get().getDeviation()));
         playerData.put("glickoChange", String.valueOf(player.get().getGlickoChange()));
-        playerData.put("name", player.get().getName());
-
         recentGameList.add(playerData);
       }
     }
     model.addAttribute("recentGameList", recentGameList);
+
+    PlayerInfo player = playerService.getPlayer(name);
+    if(player != null) {
+      model.addAttribute("name", player.getName());
+      model.addAttribute("gameCount", player.getGameStats().getMatchCount());
+      model.addAttribute("winCount", player.getGameStats().getWinCount());
+      model.addAttribute("lossCount", player.getGameStats().getLossCount());
+    }
     return "playerOverview";
   }
 
@@ -88,7 +94,7 @@ public class PlayerController {
   private PlayerViewModel convertToPlayerViewModel(final PlayerInfo playerInfo){
     PlayerViewModel playerViewModel = new PlayerViewModel();
     playerViewModel.setName(playerInfo.getName());
-    playerViewModel.setGlicko(playerInfo.getGlicko());
+    playerViewModel.setGlicko(playerInfo.getGameStats().getGlicko());
     return playerViewModel;
   }
 }

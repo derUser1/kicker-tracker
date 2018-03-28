@@ -40,12 +40,12 @@ public class PlayerRepository {
       final int winCount, final int lossCount) {
     Query query = new Query();
     Update update = new Update()
-        .set("glicko", glicko)
-        .set("deviation", deviation)
-        .set("volatility", volatility)
-        .set("matchCount", mathCount)
-        .set("winCount", winCount)
-        .set("lossCount", lossCount)
+        .set("gameStats.glicko", glicko)
+        .set("gameStats.deviation", deviation)
+        .set("gameStats.volatility", volatility)
+        .set("gameStats.matchCount", mathCount)
+        .set("gameStats.winCount", winCount)
+        .set("gameStats.lossCount", lossCount)
         .set("lastModified", Instant.now());
     mongoTemplate.updateMulti(query, update, PlayerInfo.class);
   }

@@ -58,13 +58,13 @@ public class GlickoStats implements StatsAlgorithm {
       Player opponent = getOpponent(player, teamTwo);
       PlayerInfo currentPlayerInfo = playerService.getPlayer(player.getName());
       PlayerInfo opponentPlayerInfo = playerService.getPlayer(opponent.getName());
-      Glicko2 newGlicko = computeGlicko(currentPlayerInfo, opponentPlayerInfo, eloResult);
+      Glicko2 newGlicko = computeGlicko(currentPlayerInfo.getGameStats(), opponentPlayerInfo.getGameStats(), eloResult);
 
       Player.PlayerBuilder playerBuilder = player.toBuilder()
           .glicko((int) newGlicko.rating())
           .deviation((int) newGlicko.ratingDeviation())
           .volatility(newGlicko.ratingVolatility())
-          .glickoChange(currentPlayerInfo.getGlicko() - (int) newGlicko.rating());
+          .glickoChange((int) newGlicko.rating() - currentPlayerInfo.getGameStats().getGlicko());
       result.add(playerBuilder.build());
     }
     return result;
@@ -77,7 +77,7 @@ public class GlickoStats implements StatsAlgorithm {
    * @param outcome game outcome
    * @return new glicko value
    */
-  private Glicko2 computeGlicko(final PlayerInfo player, final PlayerInfo opponent, final EloResult outcome){
+  private Glicko2 computeGlicko(final PlayerInfo.Stats player, final PlayerInfo.Stats opponent, final EloResult outcome){
     Glicko2 currentPlayer = new Glicko2(player.getGlicko(), player.getDeviation(), player.getVolatility());
     Glicko2 opponentPlayer = new Glicko2(opponent.getGlicko(), opponent.getDeviation(), opponent.getVolatility());
 

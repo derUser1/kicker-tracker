@@ -8,32 +8,47 @@
 <body>
 <div class="container">
     <div th:replace="fragments/header :: header">&nbsp;</div>
-    <p>TODO: add graph here</p>
-    <div class="card">
-        <div class="card-header">
-            <strong>Recent games</strong>
+
+    <!--<h3 align="center" th:text="#{overview.player.heading}"/>-->
+    <div class="row">
+        <div class="col-md">
+            <p>
+                 <strong th:text="#{overview.player.name}"/>: <span th:text="${name}"/>
+            <br/><strong th:text="#{overview.player.game.count}"/>: <span th:text="${gameCount}"/>
+            <br/><strong th:text="#{overview.player.game.win.count}"/>: <span th:text="${winCount}"/>
+            <br/><strong th:text="#{overview.player.game.loss.count}"/>: <span th:text="${lossCount}"/>
+            </p>
         </div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Timestamp</th>
-                    <th>Glicko</th>
-                    <th>Glicko change</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="g,iter : ${recentGameList}">
-                    <tr>
-                        <td th:text="${iter.index + 1}"/>
-                        <td><span th:text="${g.get('timestamp')}"/></td>
-                        <td><span th:text="${g.get('glicko')}"/>&plusmn;<span th:text="${g.get('deviation')}"/></td>
-                        <td><span th:text="${g.get('glickoChange')}"/></td>
-                    </tr>
-                </th:block>
-                </tbody>
-            </table>
+    </div>
+    <div class="row">
+        <div class="col-md">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Recent games</strong>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th th:text="#{overview.player.timestamp}"/>
+                            <th th:text="#{overview.player.glicko}"/>
+                            <th th:text="#{overview.player.glicko.change}"/>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="g,iter : ${recentGameList}">
+                            <tr>
+                                <td th:text="${iter.index + 1}"/>
+                                <td><span th:text="${g.timestamp}"/></td>
+                                <td><span th:text="${g.glicko}"/>&plusmn;<span th:text="${g.deviation}"/></td>
+                                <td><span th:text="${g.glickoChange}"/></td>
+                            </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

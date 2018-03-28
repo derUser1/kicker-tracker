@@ -14,16 +14,16 @@
         <div class="col-md">
             <div class="card">
                 <div class="card-header">
-                    <strong>Recent games</strong>
+                    <strong th:text="#{overview.matches.recent}">Recent games</strong>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Team 1</th>
-                            <th>Score</th>
-                            <th>Team 2</th>
+                            <th th:text="#{overview.matches.team.one}"/>
+                            <th th:text="#{overview.matches.team.score}"/>
+                            <th th:text="#{overview.matches.team.two}"/>
                         </tr>
                         </thead>
                         <tbody>
@@ -31,7 +31,7 @@
                             <tr>
                                 <td th:text="${iter.index + 1}"/>
                                 <td><span th:text="${m.teamOne.players[0]}"/><br/><span th:text="${m.teamOne.players[1]}"/></td>
-                                <td><span th:text="${m.teamOne.score}"/> : <span th:text="${m.teamTwo.score}"/></td>
+                                <td><span th:text="${m.teamOne.score} + ' : ' + ${m.teamTwo.score}"/></td>
                                 <td><span th:text="${m.teamTwo.players[0]}"/><br/><span th:text="${m.teamTwo.players[1]}"/></td>
                             </tr>
                         </th:block>
@@ -43,15 +43,15 @@
         <div class="col-md">
             <div class="card">
                 <div class="card-header">
-                    <strong>Player ranking</strong>
+                    <strong th:text="#{overview.matches.player.ranking}">Player ranking</strong>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Name</th>
-                            <th>Glicko</th>
+                            <th th:text="#{overview.player.name}">Name</th>
+                            <th th:text="#{overview.player.glicko}">Glicko</th>
                         </tr>
                         </thead>
                         <tbody>

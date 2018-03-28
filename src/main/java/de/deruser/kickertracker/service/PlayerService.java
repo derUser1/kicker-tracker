@@ -1,6 +1,7 @@
 package de.deruser.kickertracker.service;
 
 import de.deruser.kickertracker.Repository.PlayerRepository;
+import de.deruser.kickertracker.model.domain.Player;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
 
 import java.time.Instant;
@@ -28,8 +29,10 @@ public class PlayerService {
    * @return Just added {@link PlayerInfo}
    */
   public PlayerInfo addPlayer(final String name){
+    final PlayerInfo.Stats stats = PlayerInfo.Stats.builder()
+            .glicko(1500).deviation(350).volatility(0.06d).build();
     final PlayerInfo playerInfo = PlayerInfo.builder().name(name)
-            .glicko(1500).deviation(350).volatility(0.06d)
+            .gameStats(stats)
             .created(Instant.now()).build();
     playerRepository.save(playerInfo);
     return playerInfo;
@@ -82,18 +85,22 @@ public class PlayerService {
   public void updatePlayerStats(final String name, final int glicko, final int deviation, final double volatility,
       final boolean winner){
     PlayerInfo oldPlayerInfo = playerRepository.getPlayer(name);
-    PlayerInfo.PlayerInfoBuilder playerInfoBuilder = oldPlayerInfo.toBuilder()
-        .glicko(glicko)
-        .deviation(deviation)
-        .volatility(volatility)
-        .matchCount(oldPlayerInfo.getMatchCount()+1)
-        .lastModified(Instant.now());
+    PlayerInfo.Stats.StatsBuilder statsBuilder = oldPlayerInfo.getGameStats().toBuilder();
+    statsBuilder.glicko(glicko)
+            .deviation(deviation)
+            .volatility(volatility)
+            .matchCount(oldPlayerInfo.getGameStats().getMatchCount()+1);
 
     if(winner){
-      playerInfoBuilder.winCount(oldPlayerInfo.getWinCount() +1);
+      statsBuilder.winCount(oldPlayerInfo.getGameStats().getWinCount() +1);
     }else{
-      playerInfoBuilder.lossCount(oldPlayerInfo.getLossCount() + 1);
+      statsBuilder.lossCount(oldPlayerInfo.getGameStats().getLossCount() + 1);
     }
+
+    PlayerInfo.PlayerInfoBuilder playerInfoBuilder = oldPlayerInfo.toBuilder()
+            .gameStats(statsBuilder.build())
+            .lastModified(Instant.now());
+
     playerRepository.save(playerInfoBuilder.build());
   }
 
