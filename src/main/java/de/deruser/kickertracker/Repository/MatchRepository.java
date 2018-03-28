@@ -1,4 +1,4 @@
-package de.deruser.kickertracker.service;
+package de.deruser.kickertracker.Repository;
 
 import de.deruser.kickertracker.model.domain.Match;
 

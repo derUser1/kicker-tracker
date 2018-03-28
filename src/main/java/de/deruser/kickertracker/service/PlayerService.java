@@ -1,6 +1,6 @@
 package de.deruser.kickertracker.service;
 
-import de.deruser.kickertracker.model.domain.Player;
+import de.deruser.kickertracker.Repository.PlayerRepository;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
 
 import java.time.Instant;
@@ -63,20 +63,41 @@ public class PlayerService {
         .collect(Collectors.toSet());
   }
 
+  //  /**
+//   * Update  statisic of a player
+//   * @param player new player stats
+//   */
+//  public void updatePlayerStats(final Player player){
+//    PlayerInfo.PlayerInfoBuilder playerInfoBuilder = playerRepository.getPlayer(player.getName()).toBuilder()
+//            .glicko(player.getGlicko())
+//            .deviation(player.getDeviation())
+//            .volatility(player.getVolatility())
+//            .lastModified(Instant.now());
+//    playerRepository.save(playerInfoBuilder.build());
+//  }
+
   /**
    * Update  statisic of a player
-   * @param player new player stats
    */
-  public void updatePlayerStats(final Player player){
-    PlayerInfo.PlayerInfoBuilder playerInfoBuilder = playerRepository.getPlayer(player.getName()).toBuilder()
-            .glicko(player.getGlicko())
-            .deviation(player.getDeviation())
-            .volatility(player.getVolatility())
-            .lastModified(Instant.now());
+  public void updatePlayerStats(final String name, final int glicko, final int deviation, final double volatility,
+      final boolean winner){
+    PlayerInfo oldPlayerInfo = playerRepository.getPlayer(name);
+    PlayerInfo.PlayerInfoBuilder playerInfoBuilder = oldPlayerInfo.toBuilder()
+        .glicko(glicko)
+        .deviation(deviation)
+        .volatility(volatility)
+        .matchCount(oldPlayerInfo.getMatchCount()+1)
+        .lastModified(Instant.now());
+
+    if(winner){
+      playerInfoBuilder.winCount(oldPlayerInfo.getWinCount() +1);
+    }else{
+      playerInfoBuilder.lossCount(oldPlayerInfo.getLossCount() + 1);
+    }
     playerRepository.save(playerInfoBuilder.build());
   }
 
   public void resetAllStats(final int glicko, final int deviation, final double volatility){
-    playerRepository.restStats(glicko, deviation, volatility);
+    playerRepository.restStats(glicko, deviation, volatility, 0, 0, 0);
   }
 }

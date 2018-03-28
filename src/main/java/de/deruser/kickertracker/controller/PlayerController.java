@@ -59,6 +59,7 @@ public class PlayerController {
         playerData.put("glicko", String.valueOf(player.get().getGlicko()));
         playerData.put("deviation", String.valueOf(player.get().getDeviation()));
         playerData.put("glickoChange", String.valueOf(player.get().getGlickoChange()));
+        playerData.put("name", player.get().getName());
 
         recentGameList.add(playerData);
       }

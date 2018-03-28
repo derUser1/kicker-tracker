@@ -133,3 +133,4 @@ fabric.properties
 /.gradle/
 /build/
 /.idea/
+!/gradle/wrapper/gradle-wrapper.jar

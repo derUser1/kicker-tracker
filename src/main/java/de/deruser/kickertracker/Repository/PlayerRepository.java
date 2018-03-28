@@ -1,7 +1,8 @@
-package de.deruser.kickertracker.service;
+package de.deruser.kickertracker.Repository;
 
 import de.deruser.kickertracker.model.domain.PlayerInfo;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +36,17 @@ public class PlayerRepository {
     mongoTemplate.save(playerInfo);
   }
 
-  public void restStats(final int glicko, final int deviation, final double volatility) {
+  public void restStats(final int glicko, final int deviation, final double volatility, final int mathCount,
+      final int winCount, final int lossCount) {
     Query query = new Query();
     Update update = new Update()
         .set("glicko", glicko)
         .set("deviation", deviation)
-        .set("volatility", volatility);
+        .set("volatility", volatility)
+        .set("matchCount", mathCount)
+        .set("winCount", winCount)
+        .set("lossCount", lossCount)
+        .set("lastModified", Instant.now());
     mongoTemplate.updateMulti(query, update, PlayerInfo.class);
   }
 }
