@@ -13,17 +13,15 @@ import de.deruser.kickertracker.service.PlayerService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -67,6 +65,8 @@ public class MatchController {
     return "matchesOverview";
   }
 
+  /*--------------- API part -----------------*/
+  //change url
   @PostMapping("/api/matches")
   public String addMatch(@ModelAttribute("matchViewModel") MatchViewModel matchViewModel){
     matchService.addMatch(convertMatchViewModel(matchViewModel));
@@ -79,7 +79,18 @@ public class MatchController {
     return ResponseEntity.ok().build();
   }
 
-  /*--------- Helper methods --------------------*/
+  @GetMapping(value = "/api/matches", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public List<Match> getAllMatches(){
+    return matchService.getAllMatches();
+  }
+
+  @PostMapping(value = "/api/matches", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void addMatches(@RequestBody final List<Match> matches){
+    matches.forEach(matchService::addMatch);
+  }
+
+  /*--------------- Helper methods -----------------*/
   private PlayerViewModel convertToPlayerViewModel(final PlayerInfo playerInfo){
     PlayerViewModel playerViewModel = new PlayerViewModel();
     playerViewModel.setName(playerInfo.getName());

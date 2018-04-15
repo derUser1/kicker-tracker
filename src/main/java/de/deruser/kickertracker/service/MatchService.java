@@ -1,16 +1,15 @@
 package de.deruser.kickertracker.service;
 
-import de.deruser.kickertracker.Repository.MatchRepository;
+import de.deruser.kickertracker.repository.MatchRepository;
 import de.deruser.kickertracker.model.domain.Match;
 import de.deruser.kickertracker.model.domain.Player;
 import de.deruser.kickertracker.model.domain.Team;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component
 public class MatchService {
@@ -49,7 +48,7 @@ public class MatchService {
     match.getTeams().forEach(t -> {
       for (Player player : t.getPlayers()) {
         playerService.updatePlayerStats(player.getName(), player.getGlicko(), player.getDeviation(), player.getVolatility(),
-            t.getScore() == 10);
+            t.getScore() == 10, match.getTimestamp());
       }
     });
   }
@@ -62,7 +61,7 @@ public class MatchService {
    * @return list of {@link Match}
    */
   public List<Match> getRecentMatches(final String name, final int skip, final int limit) {
-    return this.matchRepository.findRecentGamesForPlayer(name, skip, limit);
+    return this.matchRepository.findRecentMatchesForPlayer(name, skip, limit);
   }
 
   /**
@@ -135,12 +134,18 @@ public class MatchService {
   }
 
   public void reprocessStats() {
+    System.out.println("Start recomputation of all stats");
     playerService.resetAllStats(1500, 350, 0.06d);
-    List<Match> matches = matchRepository.finaAllMatches();
+    List<Match> matches = matchRepository.findAllMatches();
     for(Match match : matches){
       Match updatedMatch = statsComputationService.compute(match);
       matchRepository.save(updatedMatch);
       updatePlayersGlicko(updatedMatch);
     }
+    System.out.println("Finished recomputation of all stats");
+  }
+
+  public List<Match> getAllMatches() {
+    return matchRepository.findAllMatches();
   }
 }

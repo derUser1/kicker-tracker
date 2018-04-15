@@ -1,21 +1,24 @@
 package de.deruser.kickertracker.service;
 
-import de.deruser.kickertracker.Repository.PlayerRepository;
-import de.deruser.kickertracker.model.domain.Player;
+import de.deruser.kickertracker.repository.PlayerRepository;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 @Component
 public class PlayerService {
 
   private PlayerRepository playerRepository;
+
+  private final PasswordEncoder PASSWORD_ENCODER = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  private static final String DEFAULT_PASSWORD = "password";
 
   @Autowired
   public PlayerService(final PlayerRepository playerRepository){
@@ -32,6 +35,7 @@ public class PlayerService {
     final PlayerInfo.Stats stats = PlayerInfo.Stats.builder()
             .glicko(1500).deviation(350).volatility(0.06d).build();
     final PlayerInfo playerInfo = PlayerInfo.builder().name(name)
+            .password(PASSWORD_ENCODER.encode(DEFAULT_PASSWORD))
             .gameStats(stats)
             .created(Instant.now()).build();
     playerRepository.save(playerInfo);
@@ -66,24 +70,11 @@ public class PlayerService {
         .collect(Collectors.toSet());
   }
 
-  //  /**
-//   * Update  statisic of a player
-//   * @param player new player stats
-//   */
-//  public void updatePlayerStats(final Player player){
-//    PlayerInfo.PlayerInfoBuilder playerInfoBuilder = playerRepository.getPlayer(player.getName()).toBuilder()
-//            .glicko(player.getGlicko())
-//            .deviation(player.getDeviation())
-//            .volatility(player.getVolatility())
-//            .lastModified(Instant.now());
-//    playerRepository.save(playerInfoBuilder.build());
-//  }
-
   /**
    * Update  statisic of a player
    */
   public void updatePlayerStats(final String name, final int glicko, final int deviation, final double volatility,
-      final boolean winner){
+      final boolean winner, final Instant matchTimestamp){
     PlayerInfo oldPlayerInfo = playerRepository.getPlayer(name);
     PlayerInfo.Stats.StatsBuilder statsBuilder = oldPlayerInfo.getGameStats().toBuilder();
     statsBuilder.glicko(glicko)
@@ -99,7 +90,8 @@ public class PlayerService {
 
     PlayerInfo.PlayerInfoBuilder playerInfoBuilder = oldPlayerInfo.toBuilder()
             .gameStats(statsBuilder.build())
-            .lastModified(Instant.now());
+            .lastModified(Instant.now())
+            .lastMatch(matchTimestamp);
 
     playerRepository.save(playerInfoBuilder.build());
   }
@@ -107,4 +99,9 @@ public class PlayerService {
   public void resetAllStats(final int glicko, final int deviation, final double volatility){
     playerRepository.restStats(glicko, deviation, volatility, 0, 0, 0);
   }
+
+  public void resetPassword(String name) {
+    playerRepository.resetPassword(name, PASSWORD_ENCODER.encode(DEFAULT_PASSWORD));
+  }
+
 }

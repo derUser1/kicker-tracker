@@ -1,16 +1,15 @@
-package de.deruser.kickertracker.Repository;
+package de.deruser.kickertracker.repository;
 
 import de.deruser.kickertracker.model.domain.PlayerInfo;
-
-import java.time.Instant;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
+import java.time.Instant;
+import java.util.List;
 
 @Repository
 public class PlayerRepository {
@@ -46,7 +45,16 @@ public class PlayerRepository {
         .set("gameStats.matchCount", mathCount)
         .set("gameStats.winCount", winCount)
         .set("gameStats.lossCount", lossCount)
-        .set("lastModified", Instant.now());
+        .set("lastModified", Instant.now())
+        .unset("lastMatch");
     mongoTemplate.updateMulti(query, update, PlayerInfo.class);
+  }
+
+  public void resetPassword(String name, String newPassword) {
+    Query query = new Query()
+            .addCriteria(Criteria.where("name").is(name));
+    Update update = new Update()
+            .set("password", newPassword);
+    mongoTemplate.updateFirst(query, update, PlayerInfo.class);
   }
 }

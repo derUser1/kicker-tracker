@@ -1,50 +1,60 @@
-package de.deruser.kickertracker.service;
+package de.deruser.kickertracker.service.algorithms.glicko;
 
+import de.deruser.kickertracker.repository.MatchRepository;
 import de.deruser.kickertracker.model.domain.Match;
 import de.deruser.kickertracker.model.domain.Player;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
 import de.deruser.kickertracker.model.domain.Team;
+import de.deruser.kickertracker.service.PlayerService;
+import de.deruser.kickertracker.service.StatsAlgorithm;
 import forwardloop.glicko2s.EloResult;
 import forwardloop.glicko2s.Glicko2;
 import forwardloop.glicko2s.Glicko2J;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import scala.Tuple2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+/**
+ * FIXME: Not yet implemented
+ */
 @Component
-public class GlickoStats implements StatsAlgorithm {
+@Deprecated
+public class Period implements StatsAlgorithm {
 
   private final PlayerService playerService;
+  private final MatchRepository matchRepository;
 
   @Autowired
-  public GlickoStats(final PlayerService playerService){
+  public Period(final PlayerService playerService,
+                final MatchRepository matchRepository){
     this.playerService = playerService;
+    this.matchRepository = matchRepository;
   }
 
   @Override
   public String getName() {
-    return "glicko";
+    return "glickoPeriod";
   }
 
   @Override
   public Match compute(Match match) {
-    Team teamOne = match.getTeams().get(0);
-    Team teamTwo = match.getTeams().get(1);
+//    Team teamOne = match.getTeams().get(0);
+//    Team teamTwo = match.getTeams().get(1);
+//
+//    Team.TeamBuilder teamOneBuilder = teamOne.toBuilder().players(computeGlicko(teamOne, teamTwo));
+//    Team.TeamBuilder teamTwoBuilder = teamTwo.toBuilder().players(computeGlicko(teamTwo, teamOne));
+//
+//    return match.toBuilder()
+//        .teams(Arrays.asList(teamOneBuilder.build(), teamTwoBuilder.build()))
+//        .build();
 
-    Team.TeamBuilder teamOneBuilder = teamOne.toBuilder().players(computeGlicko(teamOne, teamTwo));
-    Team.TeamBuilder teamTwoBuilder = teamTwo.toBuilder().players(computeGlicko(teamTwo, teamOne));
-
-    return match.toBuilder()
-        .teams(Arrays.asList(teamOneBuilder.build(), teamTwoBuilder.build()))
-        .build();
+    return null;
   }
-  
+
   /**
    * Computes new stats for each player of the first team (teamOne)
    * @param teamOne team, which player stats will be computed

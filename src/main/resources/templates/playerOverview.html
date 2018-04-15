@@ -32,6 +32,7 @@
                         <tr>
                             <th>#</th>
                             <th th:text="#{overview.player.timestamp}"/>
+                            <th th:text="#{overview.player.result}"/>
                             <th th:text="#{overview.player.glicko}"/>
                             <th th:text="#{overview.player.glicko.change}"/>
                         </tr>
@@ -41,6 +42,7 @@
                             <tr>
                                 <td th:text="${iter.index + 1}"/>
                                 <td><span th:text="${g.timestamp}"/></td>
+                                <td><span th:class="${g.won} ? text-success : text-danger" th:text="${g.result}"/></td>
                                 <td><span th:text="${g.glicko}"/>&plusmn;<span th:text="${g.deviation}"/></td>
                                 <td><span th:text="${g.glickoChange}"/></td>
                             </tr>

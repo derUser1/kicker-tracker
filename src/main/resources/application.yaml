@@ -1,1 +1,5 @@
 spring.data.mongodb.database: kickertracker
+stats.computation.algorithm: glickoCompositeTeam
+
+admin.username: admin
+admin.password: admin

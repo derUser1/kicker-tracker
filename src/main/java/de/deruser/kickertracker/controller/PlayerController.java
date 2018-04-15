@@ -3,10 +3,12 @@ package de.deruser.kickertracker.controller;
 import de.deruser.kickertracker.model.domain.Match;
 import de.deruser.kickertracker.model.domain.Player;
 import de.deruser.kickertracker.model.domain.PlayerInfo;
+import de.deruser.kickertracker.model.domain.Team;
 import de.deruser.kickertracker.model.view.PlayerViewModel;
 import de.deruser.kickertracker.service.MatchService;
 import de.deruser.kickertracker.service.PlayerService;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,23 +45,45 @@ public class PlayerController {
     return "playerOverview";
   }
 
+  @GetMapping(value = "/players/current", produces = MediaType.TEXT_HTML_VALUE)
+  public String getPlayer(Principal principal){
+    return "redirect:/players/" + principal.getName();
+  }
 
   @GetMapping(value = "/players/{name}", produces = MediaType.TEXT_HTML_VALUE)
-  public String getPlayer(@PathVariable("name") String name, Model model){
+  public String getPlayer(@PathVariable("name") String name, Model model, Principal principal){
+    if(!name.equals(principal.getName())){
+      throw new IllegalArgumentException("Logged in user differs from url one");
+    }
+
     List<Match> recentMatches = matchService.getRecentMatches(name, 0, 10);
 
     List<Map<String, String>> recentGameList = new ArrayList<>();
     for(Match match : recentMatches) {
-      Optional<Player> player = match.getTeams().stream()
-          .flatMap(team -> team.getPlayers().stream())
-          .filter(p -> p.getName().equals(name))
-          .findAny();
-      if (player.isPresent()) {
+      Team oppositeTeam = null;
+      Team playersTeam = null;
+      Player player = null;
+      for(Team team : match.getTeams()) {
+        Optional<Player> playerOptional = team.getPlayers().stream()
+                .filter(p -> p.getName().equals(name)).findAny();
+
+        if (playerOptional.isPresent()) {
+          playersTeam = team;
+          player = playerOptional.get();
+        }
+        else {
+          oppositeTeam = team;
+        }
+      }
+
+      if(player != null && oppositeTeam != null) {
         Map<String, String> playerData = new HashMap<>();
         playerData.put("timestamp", match.getTimestamp().toString());
-        playerData.put("glicko", String.valueOf(player.get().getGlicko()));
-        playerData.put("deviation", String.valueOf(player.get().getDeviation()));
-        playerData.put("glickoChange", String.valueOf(player.get().getGlickoChange()));
+        playerData.put("glicko", String.valueOf(player.getGlicko()));
+        playerData.put("result", formatResult(playersTeam.getScore(), oppositeTeam.getScore()));
+        playerData.put("won", String.valueOf(playersTeam.getScore() > oppositeTeam.getScore()));
+        playerData.put("deviation", String.valueOf(player.getDeviation()));
+        playerData.put("glickoChange", String.valueOf(player.getGlickoChange()));
         recentGameList.add(playerData);
       }
     }
@@ -74,6 +99,9 @@ public class PlayerController {
     return "playerOverview";
   }
 
+  private String formatResult(int playersTeam, int oppositeTeam){
+    return String.format("%s : %s", playersTeam, oppositeTeam);
+  }
 
 
   /*-------------- API part ----------------*/
@@ -84,12 +112,12 @@ public class PlayerController {
   }
 
   //TODO change to RequestBody / JSON
-  @PostMapping(value = "/api/players", produces = MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+  @Secured("ADMIN")
+  @PostMapping(value = "/api/players", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public ResponseEntity<?> addPlayer(@RequestParam("name") String name){
     return ResponseEntity.ok(playerService.addPlayer(name));
   }
-
 
   private PlayerViewModel convertToPlayerViewModel(final PlayerInfo playerInfo){
     PlayerViewModel playerViewModel = new PlayerViewModel();

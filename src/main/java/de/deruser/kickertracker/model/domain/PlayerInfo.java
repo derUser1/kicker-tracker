@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,9 +19,11 @@ public class PlayerInfo {
   @Id
   private String name;
   private String password;
+  private List<String> roles;
   private String team;
   private Instant created;
   private Instant lastModified;
+  private Instant lastMatch;
   private Stats gameStats;
 
   @Getter
