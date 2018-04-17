@@ -10,7 +10,7 @@ final class GlickoUtils{
 
     static int getDeviation(PlayerInfo.Stats playerInfo, Instant lastMatch, Instant currentMatch){
         long daysBetween = DAYS.between(lastMatch, currentMatch);
-        long deviation = playerInfo.getDeviation() + Math.abs(daysBetween);
+        long deviation = Math.min(playerInfo.getDeviation() + Math.abs(daysBetween), 350);
         return (int) deviation;
     }
 

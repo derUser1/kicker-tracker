@@ -10,6 +10,20 @@
                     <a class="nav-link " href="#" th:href="@{/players/current}" th:text="#{navigation.player.stats}"/>
                 </li>
             </ul>
+
+            <ul class="navbar-nav navbar-right">
+                <li>
+                    <a href="/login" th:href="@{/login}">
+                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign in
+                    </a>
+                </li>
+                <li>
+                    <a href="/logout" th:href="@{#}" onclick="$('#form').submit();">
+                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp;Logout
+                    </a>
+                    <form class="hidden" id="form" method="post" th:action="@{/logout}"></form>
+                </li>
+            </ul>
         </div>
     </nav>
 </html>

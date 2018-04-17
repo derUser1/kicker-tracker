@@ -41,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/js/**", "/images/**", "/**/favicon.ico").permitAll()
                 .anyRequest().authenticated()
                 .and()
-//                .csrf().disable()
+                .csrf().disable()
             .formLogin()
                 .loginPage("/login").permitAll()
                 .and()

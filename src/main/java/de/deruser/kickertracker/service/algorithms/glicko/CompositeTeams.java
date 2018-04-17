@@ -14,10 +14,8 @@ import org.springframework.stereotype.Component;
 import scala.Tuple2;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static de.deruser.kickertracker.service.algorithms.glicko.GlickoUtils.getStats;
@@ -42,11 +40,15 @@ public class CompositeTeams implements StatsAlgorithm {
 
   @Override
   public Match compute(Match match) {
+    Map<String, PlayerInfo> playerInfoMap = match.getTeams().stream().flatMap(t -> t.getPlayers().stream())
+            .map(p -> playerService.getPlayer(p.getName()))
+            .collect(Collectors.toMap(PlayerInfo::getName, Function.identity()));
+
     Team teamOne = match.getTeams().get(0);
     Team teamTwo = match.getTeams().get(1);
 
-    Team.TeamBuilder teamOneBuilder = teamOne.toBuilder().players(computeGlicko(teamOne, teamTwo, match.getTimestamp()));
-    Team.TeamBuilder teamTwoBuilder = teamTwo.toBuilder().players(computeGlicko(teamTwo, teamOne, match.getTimestamp()));
+    Team.TeamBuilder teamOneBuilder = teamOne.toBuilder().players(computeGlicko(teamOne, teamTwo, match.getTimestamp(), playerInfoMap));
+    Team.TeamBuilder teamTwoBuilder = teamTwo.toBuilder().players(computeGlicko(teamTwo, teamOne, match.getTimestamp(), playerInfoMap));
 
     return match.toBuilder()
         .teams(Arrays.asList(teamOneBuilder.build(), teamTwoBuilder.build()))
@@ -59,18 +61,18 @@ public class CompositeTeams implements StatsAlgorithm {
    * @param teamTwo opponent team
    * @return List of updated player stats
    */
-  private List<Player> computeGlicko(final Team teamOne, final Team teamTwo, final Instant matchTimestamp){
+  private List<Player> computeGlicko(final Team teamOne, final Team teamTwo, final Instant matchTimestamp, final Map<String, PlayerInfo> playerInfoMap){
     List<Player> result = new ArrayList<>();
-    PlayerInfo.Stats opponentTeam = getOpponent(teamTwo, matchTimestamp);
-    PlayerInfo.Stats playersTeam = getOpponent(teamOne, matchTimestamp);
+    PlayerInfo.Stats opponentTeam = getTeamStats(teamTwo, matchTimestamp, playerInfoMap);
+    PlayerInfo.Stats playersTeam = getTeamStats(teamOne, matchTimestamp, playerInfoMap);
 
     EloResult eloResult = teamOne.getScore() > teamTwo.getScore() ? Glicko2J.Win : Glicko2J.Loss;
     Glicko2 newGlicko = computeGlicko(playersTeam, opponentTeam, eloResult);
 
     for(Player player : teamOne.getPlayers()){
-      PlayerInfo currentPlayerInfo = playerService.getPlayer(player.getName());
+      PlayerInfo currentPlayerInfo = playerInfoMap.get(player.getName());
 
-      double factor = getPercentOf(player, teamOne);
+      double factor = getPercentOf(currentPlayerInfo, teamOne, playerInfoMap);
 
       double g = (newGlicko.rating() - playersTeam.getGlicko()) * factor;
       double d = (newGlicko.ratingDeviation() - playersTeam.getDeviation()) * factor;
@@ -86,9 +88,11 @@ public class CompositeTeams implements StatsAlgorithm {
     return result;
   }
 
-  private double getPercentOf(Player player, Team team){
-    double sum = team.getPlayers().stream().mapToDouble(Player::getGlicko).sum();
-    return player.getGlicko() / sum;
+  private double getPercentOf(PlayerInfo player, Team team, Map<String, PlayerInfo> playerInfoMap){
+    double sum = team.getPlayers().stream()
+            .map(p -> playerInfoMap.get(p.getName()))
+            .mapToDouble(p -> p.getGameStats().getGlicko()).sum();
+    return player.getGameStats().getGlicko() / sum;
   }
 
   /**
@@ -113,8 +117,8 @@ public class CompositeTeams implements StatsAlgorithm {
    * @param team opponent team
    * @return opponent player
    */
-  private PlayerInfo.Stats getOpponent(final Team team, final Instant matchTimestamp){
-    List<PlayerInfo> players = team.getPlayers().stream().map(p -> playerService.getPlayer(p.getName())).collect(Collectors.toList());
+  private PlayerInfo.Stats getTeamStats(final Team team, final Instant matchTimestamp, final Map<String, PlayerInfo> playerInfoMap){
+    List<PlayerInfo> players = team.getPlayers().stream().map(p -> playerInfoMap.get(p.getName())).collect(Collectors.toList());
 
     int glicko = 0;
     int deviation = 0;

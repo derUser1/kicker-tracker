@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 public class PlayerController {
 
@@ -51,8 +53,8 @@ public class PlayerController {
   }
 
   @GetMapping(value = "/players/{name}", produces = MediaType.TEXT_HTML_VALUE)
-  public String getPlayer(@PathVariable("name") String name, Model model, Principal principal){
-    if(!name.equals(principal.getName())){
+  public String getPlayer(@PathVariable("name") String name, Model model, HttpServletRequest request){
+    if(!name.equals(request.getUserPrincipal().getName()) && !request.isUserInRole("ROLE_ADMIN")){
       throw new IllegalArgumentException("Logged in user differs from url one");
     }
 
