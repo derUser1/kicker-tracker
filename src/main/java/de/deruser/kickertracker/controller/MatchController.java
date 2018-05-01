@@ -10,6 +10,7 @@ import de.deruser.kickertracker.model.view.TeamViewModel;
 import de.deruser.kickertracker.service.MatchService;
 import de.deruser.kickertracker.service.PlayerService;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,8 +54,8 @@ public class MatchController {
     List<MatchViewModel> matchList = matchService.getRecentMatches(0,10).stream()
             .map(this::convertMatch).collect(toList());
 
-    List<PlayerViewModel> playerList = playerService.getAllPlayers().stream()
-            .sorted((p1, p2) -> Integer.compare(p2.getGameStats().getGlicko(), p1.getGameStats().getGlicko()))
+    List<PlayerViewModel> playerList = playerService.getActivePlayers(10).stream()
+            .sorted((p1, p2) -> Double.compare(p2.getGameStats().getGlicko(), p1.getGameStats().getGlicko()))
             .map(this::convertToPlayerViewModel)
             .collect(Collectors.toList());
     model.addAttribute("playerList", playerList);

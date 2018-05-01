@@ -16,6 +16,7 @@
             <p>
                  <strong th:text="#{overview.player.name}"/>: <span th:text="${name}"/>
             <br/><strong th:text="#{overview.player.game.count}"/>: <span th:text="${gameCount}"/>
+                    <span class="text-secondary" th:if="${gameCount < 10}" th:text="#{overview.player.not.ranked}"/>
             <br/><strong th:text="#{overview.player.game.win.count}"/>: <span th:text="${winCount}"/>
             <br/><strong th:text="#{overview.player.game.loss.count}"/>: <span th:text="${lossCount}"/>
             </p>
@@ -34,8 +35,8 @@
                             <th>#</th>
                             <th th:text="#{overview.player.timestamp}"/>
                             <th th:text="#{overview.player.result}"/>
-                            <th th:text="#{overview.player.glicko}"/>
-                            <th th:text="#{overview.player.glicko.change}"/>
+                            <th th:text="#{overview.player.rating}"/>
+                            <th th:text="#{overview.player.rating.change}"/>
                         </tr>
                         </thead>
                         <tbody>
@@ -44,8 +45,8 @@
                                 <td th:text="${iter.index + 1}"/>
                                 <td><span th:text="${g.timestamp}"/></td>
                                 <td><span th:class="${g.won} ? text-success : text-danger" th:text="${g.result}"/></td>
-                                <td><span th:text="${g.glicko}"/>&plusmn;<span th:text="${g.deviation}"/></td>
-                                <td><span th:text="${g.glickoChange}"/></td>
+                                <td><span th:text="${#numbers.formatDecimal(g.glicko,1, 2)}"/>&plusmn;<span th:text="${#numbers.formatDecimal(g.deviation, 1, 2)}"/></td>
+                                <td><span th:text="${#numbers.formatDecimal(g.glickoChange, 1, 2)}"/></td>
                             </tr>
                         </th:block>
                         </tbody>

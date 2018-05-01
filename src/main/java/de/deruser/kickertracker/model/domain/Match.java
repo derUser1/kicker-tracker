@@ -20,6 +20,7 @@ public class Match {
 
     private ObjectId id;
     private Instant timestamp;
+    private String userCreated;
     private List<Team> teams;
 
 }

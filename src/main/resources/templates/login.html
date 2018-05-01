@@ -1,20 +1,39 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Spring Security Example </title>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet" />
 </head>
 <body>
-<div th:if="${param.error}">
-    Invalid username and password.
+<div class="container">
+    <div th:replace="fragments/header :: header">&nbsp;</div>
+
+    <div th:if="${param.error}">
+        Invalid username and password.
+    </div>
+
+    <div th:if="${param.logout}">
+        You have been logged out.
+    </div>
+
+    <!--<form class="form-signin" th:action="@{/login}" method="post">-->
+        <!--<h4 class="form-signin-heading">Please sign in</h4>-->
+        <!--<div><label> User Name : <input type="text" name="username"/> </label></div>-->
+        <!--<div><label> Password: <input type="password" name="password"/> </label></div>-->
+        <!--<div><input class="btn btn-lg btn-primary" type="submit" value="Sign In"/></div>-->
+    <!--</form>-->
+
+
+    <form class="form-signin"  th:action="@{/login}" method="post">
+        <h4 class="form-signin-heading">Please sign in</h4>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="text" id="inputEmail" class="form-control" name="username" placeholder="User name" required="" autofocus="">
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" name="password" placeholder="Password" required="">
+        <button class="btn btn-lg btn-primary " type="submit">Sign in</button>
+    </form>
 </div>
-<div th:if="${param.logout}">
-    You have been logged out.
-</div>
-<form th:action="@{/login}" method="post">
-    <div><label> User Name : <input type="text" name="username"/> </label></div>
-    <div><label> Password: <input type="password" name="password"/> </label></div>
-    <div><input type="submit" value="Sign In"/></div>
-</form>
 </body>
 </html>

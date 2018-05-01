@@ -124,7 +124,7 @@ public class PlayerController {
   private PlayerViewModel convertToPlayerViewModel(final PlayerInfo playerInfo){
     PlayerViewModel playerViewModel = new PlayerViewModel();
     playerViewModel.setName(playerInfo.getName());
-    playerViewModel.setGlicko(playerInfo.getGameStats().getGlicko());
+    playerViewModel.setGlicko((int)playerInfo.getGameStats().getGlicko());
     return playerViewModel;
   }
 }

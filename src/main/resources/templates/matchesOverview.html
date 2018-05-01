@@ -52,7 +52,7 @@
                         <tr>
                             <th>#</th>
                             <th th:text="#{overview.player.name}">Name</th>
-                            <th th:text="#{overview.player.glicko}">Glicko</th>
+                            <th th:text="#{overview.player.rating}">Glicko</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -60,7 +60,7 @@
                             <tr>
                                 <td th:text="${iter.index + 1}"/>
                                 <td><span th:text="${p.name}"/></td>
-                                <td><span th:text="${p.glicko}"/></td>
+                                <td><span th:text="${#numbers.formatDecimal(p.glicko,1,2)}"/></td>
                             </tr>
                         </th:block>
                         </tbody>

@@ -35,7 +35,7 @@ public class PlayerRepository {
     mongoTemplate.save(playerInfo);
   }
 
-  public void restStats(final int glicko, final int deviation, final double volatility, final int mathCount,
+  public void restStats(final double glicko, final double deviation, final double volatility, final int mathCount,
       final int winCount, final int lossCount) {
     Query query = new Query();
     Update update = new Update()
@@ -52,9 +52,15 @@ public class PlayerRepository {
 
   public void resetPassword(String name, String newPassword) {
     Query query = new Query()
-            .addCriteria(Criteria.where("name").is(name));
+        .addCriteria(Criteria.where("name").is(name));
     Update update = new Update()
-            .set("password", newPassword);
+        .set("password", newPassword);
     mongoTemplate.updateFirst(query, update, PlayerInfo.class);
+  }
+
+  public List<PlayerInfo> getActivePlayers(int gameCount) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("gameStats.matchCount").gte(gameCount));
+    return mongoTemplate.find(query, PlayerInfo.class);
   }
 }

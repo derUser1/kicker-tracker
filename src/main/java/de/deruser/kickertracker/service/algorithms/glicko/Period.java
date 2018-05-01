@@ -71,10 +71,10 @@ public class Period implements StatsAlgorithm {
       Glicko2 newGlicko = computeGlicko(currentPlayerInfo.getGameStats(), opponentPlayerInfo.getGameStats(), eloResult);
 
       Player.PlayerBuilder playerBuilder = player.toBuilder()
-          .glicko((int) newGlicko.rating())
-          .deviation((int) newGlicko.ratingDeviation())
+          .glicko( newGlicko.rating())
+          .deviation( newGlicko.ratingDeviation())
           .volatility(newGlicko.ratingVolatility())
-          .glickoChange((int) newGlicko.rating() - currentPlayerInfo.getGameStats().getGlicko());
+          .glickoChange( newGlicko.rating() - currentPlayerInfo.getGameStats().getGlicko());
       result.add(playerBuilder.build());
     }
     return result;
@@ -110,8 +110,8 @@ public class Period implements StatsAlgorithm {
         opponent = currentOpponent;
         continue;
       }
-      int currentOpponentGlicko = Math.abs(player.getGlicko() - currentOpponent.getGlicko());
-      int oldOpponentGlicko = Math.abs(player.getGlicko() - currentOpponent.getGlicko());
+      double currentOpponentGlicko = Math.abs(player.getGlicko() - currentOpponent.getGlicko());
+      double oldOpponentGlicko = Math.abs(player.getGlicko() - currentOpponent.getGlicko());
       if(currentOpponentGlicko < oldOpponentGlicko){
         opponent = currentOpponent;
       }

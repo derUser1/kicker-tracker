@@ -30,8 +30,8 @@ public class PlayerInfo {
   @Builder(toBuilder = true)
   @ToString
   public static class Stats{
-    private int glicko;
-    private int deviation;
+    private double glicko;
+    private double deviation;
     private double volatility;
     private int matchCount;
     private int winCount;

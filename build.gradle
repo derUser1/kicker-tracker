@@ -17,6 +17,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb:2.0.1.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-security:2.0.1.RELEASE'
     compile 'com.github.forwardloop:glicko2s_2.11:0.9.4'
+    compile 'de.gesundkrank.jskills:jskills:1.0'
 
     compileOnly 'org.projectlombok:lombok:1.16.20'
 

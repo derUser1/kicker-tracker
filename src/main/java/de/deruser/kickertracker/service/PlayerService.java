@@ -43,11 +43,20 @@ public class PlayerService {
   }
 
   /**
-   * Get all players
+   * Returns all players
    * @return List of {@link PlayerInfo}
    */
   public List<PlayerInfo> getAllPlayers(){
     return playerRepository.getAllPlayers();
+  }
+
+  /**
+   * Returns all players that has player certain amount of games
+   * @param gameCount amount of games played
+   * @return List of {@link PlayerInfo}
+   */
+  public List<PlayerInfo> getActivePlayers(int gameCount){
+    return playerRepository.getActivePlayers(gameCount);
   }
 
   /**
@@ -73,7 +82,7 @@ public class PlayerService {
   /**
    * Update  statisic of a player
    */
-  public void updatePlayerStats(final String name, final int glicko, final int deviation, final double volatility,
+  public void updatePlayerStats(final String name, final double glicko, final double deviation, final double volatility,
       final boolean winner, final Instant matchTimestamp){
     PlayerInfo oldPlayerInfo = playerRepository.getPlayer(name);
     PlayerInfo.Stats.StatsBuilder statsBuilder = oldPlayerInfo.getGameStats().toBuilder();
@@ -96,7 +105,7 @@ public class PlayerService {
     playerRepository.save(playerInfoBuilder.build());
   }
 
-  public void resetAllStats(final int glicko, final int deviation, final double volatility){
+  public void resetAllStats(final double glicko, final double deviation, final double volatility){
     playerRepository.restStats(glicko, deviation, volatility, 0, 0, 0);
   }
 

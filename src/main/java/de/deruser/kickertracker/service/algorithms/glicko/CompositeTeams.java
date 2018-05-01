@@ -79,10 +79,10 @@ public class CompositeTeams implements StatsAlgorithm {
       double v = (newGlicko.ratingVolatility() - playersTeam.getVolatility()) * factor;
 
       Player.PlayerBuilder playerBuilder = player.toBuilder()
-          .glicko(currentPlayerInfo.getGameStats().getGlicko() + (int) g)
-          .deviation(currentPlayerInfo.getGameStats().getDeviation() + (int) d)
+          .glicko(currentPlayerInfo.getGameStats().getGlicko() + g)
+          .deviation(currentPlayerInfo.getGameStats().getDeviation() + d)
           .volatility(currentPlayerInfo.getGameStats().getVolatility() + v)
-          .glickoChange((int) g);
+          .glickoChange(g);
       result.add(playerBuilder.build());
     }
     return result;

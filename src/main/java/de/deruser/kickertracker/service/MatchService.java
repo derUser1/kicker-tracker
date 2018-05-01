@@ -135,7 +135,7 @@ public class MatchService {
 
   public void reprocessStats() {
     System.out.println("Start recomputation of all stats");
-    playerService.resetAllStats(1500, 350, 0.06d);
+    playerService.resetAllStats(25, 8.333d, -1);
     List<Match> matches = matchRepository.findAllMatches();
     for(Match match : matches){
       Match updatedMatch = statsComputationService.compute(match);

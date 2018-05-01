@@ -10,5 +10,5 @@ import lombok.Setter;
 public class PlayerViewModel {
 
     private String name;
-    private int glicko;
+    private double glicko;
 }

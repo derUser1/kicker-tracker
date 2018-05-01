@@ -15,10 +15,10 @@ public class Player {
 
   @Indexed
   private String name;
-  private int glicko;
-  private int deviation;
+  private double glicko;
+  private double deviation;
   private double volatility;
-  private Integer glickoChange;
+  private Double glickoChange;
 
   @Override
   public boolean equals(Object o) {
