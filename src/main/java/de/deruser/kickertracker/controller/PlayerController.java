@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static java.util.stream.Collectors.joining;
 
 @Controller
 public class PlayerController {
@@ -58,9 +62,11 @@ public class PlayerController {
       throw new IllegalArgumentException("Logged in user differs from url one");
     }
 
-    List<Match> recentMatches = matchService.getRecentMatches(name, 0, 10);
+    //TODO: add a new query for graph, change this back to only 10 results
+    List<Match> recentMatches = matchService.getRecentMatches(name, 0, 100);
 
     List<Map<String, String>> recentGameList = new ArrayList<>();
+
     for(Match match : recentMatches) {
       Team oppositeTeam = null;
       Team playersTeam = null;
@@ -97,6 +103,12 @@ public class PlayerController {
       model.addAttribute("gameCount", player.getGameStats().getMatchCount());
       model.addAttribute("winCount", player.getGameStats().getWinCount());
       model.addAttribute("lossCount", player.getGameStats().getLossCount());
+
+      model.addAttribute("dataLables", IntStream.rangeClosed(1, recentGameList.size())
+          .mapToObj(String::valueOf)
+          .collect(Collectors.toList()));
+
+      model.addAttribute("data", recentGameList.stream().map(m -> m.get("glicko")).collect(Collectors.toList()));
     }
     return "playerOverview";
   }

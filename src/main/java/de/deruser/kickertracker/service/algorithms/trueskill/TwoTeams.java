@@ -87,7 +87,7 @@ public class TwoTeams implements StatsAlgorithm {
                     return p.toBuilder()
                         .glicko(rating.getMean())
                         .deviation(rating.getStandardDeviation())
-                        .glickoChange(p.getGlicko()-playerInfoMap.get(p.getName()).getGameStats().getGlicko())
+                        .glickoChange(rating.getMean()-playerInfoMap.get(p.getName()).getGameStats().getGlicko())
                         .volatility(0d)
                         .build();
                 })

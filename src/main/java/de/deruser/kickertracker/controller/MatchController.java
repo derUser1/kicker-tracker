@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -100,10 +101,12 @@ public class MatchController {
   }
 
   private Match convertMatchViewModel(final MatchViewModel matchViewModel){
+    Principal principal = SecurityContextHolder.getContext().getAuthentication();
     List<Team> teams = Arrays.asList(convertTeamViewModel(matchViewModel.getTeamOne()),
         convertTeamViewModel(matchViewModel.getTeamTwo()));
     return Match.builder()
         .timestamp(matchViewModel.getTimestamp() == null ? Instant.now() : matchViewModel.getTimestamp())
+        .createdBy(principal.getName())
         .teams(teams)
         .build();
   }

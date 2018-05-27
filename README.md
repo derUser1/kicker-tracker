@@ -29,9 +29,7 @@ Sites:
 | /players/#player name# | Player related information |
 
 ## ToDo
-* Show rating as graph
 * Build into docker
 * User management
-* Security, User login
 * Optimize html pages
 * ...
