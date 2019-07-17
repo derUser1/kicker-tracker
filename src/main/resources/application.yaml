@@ -3,3 +3,11 @@ stats.computation.algorithm: trueSkillTwoTeams
 
 admin.username: admin
 admin.password: admin
+
+
+keycloak.realm: myrealm
+keycloak.auth-server-url: http://localhost:8180/auth
+keycloak.ssl-required: external
+keycloak.resource: kicker-tracker
+keycloak.public-client: true
+keycloak.principal-attribute: preferred_username

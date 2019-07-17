@@ -1,41 +1,54 @@
 package de.deruser.kickertracker.config;
 
-import de.deruser.kickertracker.service.PlayerService;
+import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
+import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
+import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private PlayerService playerService;
-    private final String adminUsername;
-    private final String adminPassword;
+@ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
+class WebSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     @Autowired
-    public WebSecurityConfig(
-            @Value("admin.username") String adminUsername,
-            @Value("admin.password") String adminPassword,
-            final PlayerService playerService) {
-        this.playerService = playerService;
-        this.adminUsername = adminUsername;
-        this.adminPassword = adminPassword;
+    public void configureGlobal(
+        AuthenticationManagerBuilder auth) throws Exception {
+
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider
+            = keycloakAuthenticationProvider();
+        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(
+            new SimpleAuthorityMapper());
+        auth.authenticationProvider(keycloakAuthenticationProvider);
+    }
+
+    @Bean
+    public KeycloakSpringBootConfigResolver KeycloakConfigResolver() {
+        return new KeycloakSpringBootConfigResolver();
+    }
+
+    @Bean
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(
+            new SessionRegistryImpl());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
         http.authorizeRequests()
                 .antMatchers("/", "/matches", "/css/**",
                         "/js/**", "/images/**", "/**/favicon.ico").permitAll()
@@ -48,26 +61,63 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .logout()
                 .permitAll();
     }
-
-    @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
-
-        List<UserDetails> users = playerService.getAllPlayers().stream()
-                .map(p -> User.builder()
-                        .username(p.getName())
-                        .password(p.getPassword())
-                        .roles(p.getRoles().toArray(new String[0]))
-                        .build())
-                .collect(Collectors.toList());
-
-        //TODO: store admin in DB
-        users.add(User.withDefaultPasswordEncoder()
-                .username(adminUsername)
-                .password(adminPassword)
-                .roles("ADMIN")
-                .build());
-
-        return new InMemoryUserDetailsManager(users);
-    }
 }
+
+
+
+
+//@Configuration
+//@EnableWebSecurity
+//public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+//
+//    private PlayerService playerService;
+//    private final String adminUsername;
+//    private final String adminPassword;
+//
+//    @Autowired
+//    public WebSecurityConfig(
+//            @Value("admin.username") String adminUsername,
+//            @Value("admin.password") String adminPassword,
+//            final PlayerService playerService) {
+//        this.playerService = playerService;
+//        this.adminUsername = adminUsername;
+//        this.adminPassword = adminPassword;
+//    }
+//
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.authorizeRequests()
+//                .antMatchers("/", "/matches", "/css/**",
+//                        "/js/**", "/images/**", "/**/favicon.ico").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .csrf().disable()
+//            .formLogin()
+//                .loginPage("/login").permitAll()
+//                .and()
+//            .logout()
+//                .permitAll();
+//    }
+//
+//    @Bean
+//    @Override
+//    public UserDetailsService userDetailsService() {
+//
+//        List<UserDetails> users = playerService.getAllPlayers().stream()
+//                .map(p -> User.builder()
+//                        .username(p.getName())
+//                        .password(p.getPassword())
+//                        .roles(p.getRoles().toArray(new String[0]))
+//                        .build())
+//                .collect(Collectors.toList());
+//
+//        //TODO: store admin in DB
+//        users.add(User.withDefaultPasswordEncoder()
+//                .username(adminUsername)
+//                .password(adminPassword)
+//                .roles("ADMIN")
+//                .build());
+//
+//        return new InMemoryUserDetailsManager(users);
+//    }
+//}

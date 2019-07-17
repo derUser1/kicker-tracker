@@ -19,6 +19,7 @@ dependencies {
     compile 'com.github.forwardloop:glicko2s_2.11:0.9.4'
     compile 'de.gesundkrank.jskills:jskills:1.0'
     compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4:3.0.2.RELEASE'
+    compile 'org.keycloak:keycloak-spring-boot-starter:6.0.1'
 
 
     compileOnly 'org.projectlombok:lombok:1.16.20'

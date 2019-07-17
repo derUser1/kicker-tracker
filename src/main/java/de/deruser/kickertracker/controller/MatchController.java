@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.keycloak.common.util.KeycloakUriBuilder;
+import org.keycloak.constants.ServiceUrlConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +66,11 @@ public class MatchController {
     model.addAttribute("playerNames", players);
     model.addAttribute("matchList", matchList);
     model.addAttribute("matchViewModel", new MatchViewModel());
+
+    String logoutUri = KeycloakUriBuilder.fromUri("http://localhost:8180/auth").path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH)
+        .queryParam("redirect_uri", "http://localhost:8080/").build("myrealm").toString();
+
+    model.addAttribute("logout",  logoutUri);
     return "matchesOverview";
   }
 
@@ -72,7 +79,7 @@ public class MatchController {
   @PostMapping("/api/matches")
   public String addMatch(@ModelAttribute("matchViewModel") MatchViewModel matchViewModel){
     matchService.addMatch(convertMatchViewModel(matchViewModel));
-    return "redirect:/matches";
+    return "redirect:/matches?";
   }
 
   @PostMapping("/api/matches/reprocess")

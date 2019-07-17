@@ -9,13 +9,17 @@ import de.deruser.kickertracker.service.MatchService;
 import de.deruser.kickertracker.service.PlayerService;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,10 +33,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-
-import static java.util.stream.Collectors.joining;
 
 @Controller
 public class PlayerController {
@@ -57,15 +57,18 @@ public class PlayerController {
   }
 
   @GetMapping(value = "/players/{name}", produces = MediaType.TEXT_HTML_VALUE)
-  public String getPlayer(@PathVariable("name") String name, Model model, HttpServletRequest request){
-    if(!name.equals(request.getUserPrincipal().getName()) && !request.isUserInRole("ROLE_ADMIN")){
+  public String getPlayer(@PathVariable("name") String vname, Model model, HttpServletRequest request){
+    if(!vname.equals(request.getUserPrincipal().getName()) && !request.isUserInRole("ROLE_ADMIN")){
       throw new IllegalArgumentException("Logged in user differs from url one");
     }
+
+
+    final String name = toCamelCase(vname);
 
     //TODO: add a new query for graph, change this back to only 10 results
     List<Match> recentMatches = matchService.getRecentMatches(name, 0, 100);
 
-    List<Map<String, String>> recentGameList = new ArrayList<>();
+    List<Map<String, Object>> recentGameList = new ArrayList<>();
 
     for(Match match : recentMatches) {
       Team oppositeTeam = null;
@@ -85,8 +88,8 @@ public class PlayerController {
       }
 
       if(player != null && oppositeTeam != null) {
-        Map<String, String> playerData = new HashMap<>();
-        playerData.put("timestamp", match.getTimestamp().toString());
+        Map<String, Object> playerData = new HashMap<>();
+        playerData.put("timestamp", match.getTimestamp());
         playerData.put("glicko", String.valueOf(player.getGlicko()));
         playerData.put("result", formatResult(playersTeam.getScore(), oppositeTeam.getScore()));
         playerData.put("won", String.valueOf(playersTeam.getScore() > oppositeTeam.getScore()));
@@ -95,7 +98,7 @@ public class PlayerController {
         recentGameList.add(playerData);
       }
     }
-    model.addAttribute("recentGameList", recentGameList);
+    model.addAttribute("recentGameList", recentGameList.stream().limit(15).collect(Collectors.toList()));
 
     PlayerInfo player = playerService.getPlayer(name);
     if(player != null) {
@@ -108,10 +111,26 @@ public class PlayerController {
           .mapToObj(String::valueOf)
           .collect(Collectors.toList()));
 
-      model.addAttribute("data", recentGameList.stream().map(m -> m.get("glicko")).collect(Collectors.toList()));
+      model.addAttribute("data", recentGameList.stream().sorted(Comparator.comparing(m2 -> ((Instant) m2.get("timestamp"))))
+          .map(m -> m.get("glicko")).collect(Collectors.toList()));
     }
     return "playerOverview";
   }
+
+
+  static String toCamelCase(String s){
+    String[] parts = s.split("_");
+    String camelCaseString = "";
+    for (String part : parts){
+      camelCaseString = camelCaseString + toProperCase(part);
+    }
+    return camelCaseString;
+  }
+
+    static String toProperCase(String s) {
+        return s.substring(0, 1).toUpperCase() +
+            s.substring(1).toLowerCase();
+    }
 
   private String formatResult(int playersTeam, int oppositeTeam){
     return String.format("%s : %s", playersTeam, oppositeTeam);
