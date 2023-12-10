@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static java.util.stream.Collectors.joining;
 
+/* */
 @Controller
 public class PlayerController {
 
