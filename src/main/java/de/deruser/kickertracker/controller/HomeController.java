@@ -13,6 +13,7 @@ public class HomeController {
         return "index";
     }
 
+    /** login on master **/
     @GetMapping("/login")
     public String login(){
         return "login";
