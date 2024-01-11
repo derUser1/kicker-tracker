@@ -14,7 +14,7 @@ public class HomeController {
     }
 
     /** login **/
-    /* a */
+    /* b */
     @GetMapping("/login")
     public String login(){
         return "login";
